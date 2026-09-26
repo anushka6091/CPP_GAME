@@ -6,6 +6,9 @@
 #include "Item.h"
 #include <memory>
 
+// Forward declaration
+struct PlayerMemento;
+
 /**
  * @brief Concrete class representing the Human Hero player.
  * 
@@ -33,6 +36,10 @@ public:
     const Inventory& getInventory() const { return m_inventory; }
     Item* getEquippedWeapon() const { return m_equippedWeapon.get(); }
     int getBaseAttackPower() const { return m_baseAttackPower; }
+
+    // Memento Pattern Methods
+    PlayerMemento saveState() const;
+    void restoreState(const PlayerMemento& memento);
 };
 
 #endif // PLAYER_H

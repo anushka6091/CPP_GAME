@@ -32,7 +32,9 @@ public:
         EventBus* eventBus = nullptr,
         const Quest* requiredQuest = nullptr,
         const std::vector<std::unique_ptr<Quest>>& quests = {},
-        CraftingStation* craftingStation = nullptr
+        CraftingStation* craftingStation = nullptr,
+        GameEngine* engine = nullptr,
+        SaveManager* saveManager = nullptr
     );
 };
 

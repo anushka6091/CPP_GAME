@@ -36,6 +36,7 @@ public:
     bool isEmpty() const { return m_items.empty(); }
     size_t size() const { return m_items.size(); }
 
+    void clear() { m_items.clear(); }
     const std::vector<std::unique_ptr<GameObject>>& getItems() const { return m_items; }
 };
 

@@ -11,8 +11,10 @@
 #include <vector>
 
 
-// Forward declaration for ReplayCommand
+// Forward declarations
 class CommandHistory;
+class GameEngine;
+class SaveManager;
 
 /**
  * @brief Concrete Command for attacking an enemy in combat.
@@ -22,9 +24,10 @@ private:
     Player& m_player;
     Room& m_room;
     EventBus* m_eventBus;
+    GameEngine* m_engine;
 
 public:
-    AttackCommand(Player& player, Room& room, EventBus* eventBus = nullptr);
+    AttackCommand(Player& player, Room& room, EventBus* eventBus = nullptr, GameEngine* engine = nullptr);
     bool execute() override;
     std::string description() const override;
 };
@@ -180,6 +183,49 @@ private:
 
 public:
     explicit RecipesCommand(const CraftingStation& station);
+    bool execute() override;
+    std::string description() const override;
+};
+
+/**
+ * @brief Concrete Command for saving game state to SQLite via GameMemento.
+ */
+class SaveCommand : public Command {
+private:
+    GameEngine& m_engine;
+    std::string m_saveName;
+
+public:
+    SaveCommand(GameEngine& engine, std::string saveName = "");
+    bool execute() override;
+    std::string description() const override;
+};
+
+/**
+ * @brief Concrete Command for loading game state from SQLite via GameMemento.
+ */
+class LoadCommand : public Command {
+private:
+    GameEngine& m_engine;
+    std::string m_playerName;
+
+public:
+    LoadCommand(GameEngine& engine, std::string playerName);
+    bool execute() override;
+    std::string description() const override;
+};
+
+/**
+ * @brief Concrete Command for viewing the SQLite dungeon Hall of Fame leaderboard.
+ */
+class LeaderboardCommand : public Command {
+private:
+    const SaveManager& m_saveManager;
+    std::string m_sortBy;
+    std::string m_difficultyFilter;
+
+public:
+    explicit LeaderboardCommand(const SaveManager& saveManager, std::string sortBy = "turns", std::string difficultyFilter = "");
     bool execute() override;
     std::string description() const override;
 };

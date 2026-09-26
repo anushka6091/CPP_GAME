@@ -52,7 +52,17 @@ public:
     int getXp() const { return m_xp; }
 
     void setHealth(int health) { m_health = health; }
+    void setMaxHealth(int maxHp) { m_maxHealth = maxHp; m_health = maxHp; }
+    void setAttackPower(int atk) { m_attackPower = atk; }
+    void setDefense(int def) { m_defense = def; }
     void addXp(int amount) { m_xp += amount; }
+
+    void scaleStats(double multiplier) {
+        m_maxHealth = static_cast<int>(m_maxHealth * multiplier);
+        m_health = m_maxHealth;
+        m_attackPower = static_cast<int>(m_attackPower * multiplier);
+        m_defense = static_cast<int>(m_defense * multiplier);
+    }
 };
 
 #endif // CHARACTER_H

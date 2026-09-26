@@ -1,4 +1,6 @@
 #include "CommandParser.h"
+#include "GameEngine.h"
+#include "SaveManager.h"
 #include <iostream>
 #include <sstream>
 #include <algorithm>
@@ -11,7 +13,9 @@ std::unique_ptr<Command> CommandParser::parse(
     EventBus* eventBus,
     const Quest* requiredQuest,
     const std::vector<std::unique_ptr<Quest>>& quests,
-    CraftingStation* craftingStation
+    CraftingStation* craftingStation,
+    GameEngine* engine,
+    SaveManager* saveManager
 ) {
     if (!currentRoom) return nullptr;
 
@@ -36,7 +40,7 @@ std::unique_ptr<Command> CommandParser::parse(
     }
 
     if (action == "attack" || action == "fight") {
-        return std::make_unique<AttackCommand>(player, *currentRoom, eventBus);
+        return std::make_unique<AttackCommand>(player, *currentRoom, eventBus, engine);
     } 
     else if (action == "use") {
         if (targetName.empty()) {
@@ -95,6 +99,52 @@ std::unique_ptr<Command> CommandParser::parse(
     }
     else if (action == "replay" || action == "history") {
         return std::make_unique<ReplayCommand>(history);
+    }
+    else if (action == "save" && engine) {
+        return std::make_unique<SaveCommand>(*engine, targetName);
+    }
+    else if (action == "load" && engine) {
+        if (targetName.empty()) {
+            std::cout << "[CommandParser] Error: Usage is 'load <player name>'\n";
+            return nullptr;
+        }
+        return std::make_unique<LoadCommand>(*engine, targetName);
+    }
+    else if ((action == "leaderboard" || action == "scores" || action == "halloffame") && saveManager) {
+        std::stringstream argStream(targetName);
+        std::string arg1, arg2;
+        argStream >> arg1 >> arg2;
+
+        std::string sortBy = "turns";
+        std::string diffFilter = "";
+
+        auto checkDiff = [](const std::string& s) -> std::string {
+            std::string lower = s;
+            std::transform(lower.begin(), lower.end(), lower.begin(), ::tolower);
+            if (lower == "normal") return "Normal";
+            if (lower == "hard") return "Hard";
+            if (lower == "ng+" || lower == "newgameplus" || lower == "ng") return "NewGamePlus";
+            return "";
+        };
+
+        if (!arg1.empty()) {
+            std::string d = checkDiff(arg1);
+            if (!d.empty()) {
+                diffFilter = d;
+            } else if (arg1 == "turns" || arg1 == "kills") {
+                sortBy = arg1;
+            }
+        }
+        if (!arg2.empty()) {
+            std::string d = checkDiff(arg2);
+            if (!d.empty()) {
+                diffFilter = d;
+            } else if (arg2 == "turns" || arg2 == "kills") {
+                sortBy = arg2;
+            }
+        }
+
+        return std::make_unique<LeaderboardCommand>(*saveManager, sortBy, diffFilter);
     }
 
     std::cout << "[CommandParser] Error: Unknown command '" << action << "'. Type 'help' for command list.\n";

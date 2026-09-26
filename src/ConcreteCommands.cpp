@@ -1,11 +1,14 @@
 #include "ConcreteCommands.h"
 #include "CommandHistory.h"
 #include "Enemy.h"
+#include "Boss.h"
+#include "GameEngine.h"
+#include "SaveManager.h"
 #include <iostream>
 
 // ==================== AttackCommand ====================
-AttackCommand::AttackCommand(Player& player, Room& room, EventBus* eventBus)
-    : m_player(player), m_room(room), m_eventBus(eventBus) {}
+AttackCommand::AttackCommand(Player& player, Room& room, EventBus* eventBus, GameEngine* engine)
+    : m_player(player), m_room(room), m_eventBus(eventBus), m_engine(engine) {}
 
 bool AttackCommand::execute() {
     if (!m_room.hasEnemy()) {
@@ -52,6 +55,17 @@ bool AttackCommand::execute() {
             m_eventBus->publish(GameEvent(GameEventType::EnemyKilled, enemyName, 1));
         }
 
+        // Check if the defeated enemy is the Boss (or in the Boss Room)
+        if (m_room.isBossRoom() || dynamic_cast<Boss*>(enemy) != nullptr) {
+            std::cout << "\n============================================================\n";
+            std::cout << "  *** VICTORY! YOU HAVE SLAIN THE DUNGEON OVERLORD! ***     \n";
+            std::cout << "          YOU HAVE RESTORED LIGHT TO THE REALM!             \n";
+            std::cout << "============================================================\n";
+            if (m_engine) {
+                m_engine->onBossDefeated();
+            }
+        }
+
         return true;
     }
 
@@ -65,6 +79,16 @@ bool AttackCommand::execute() {
 
         if (m_eventBus) {
             m_eventBus->publish(GameEvent(GameEventType::EnemyKilled, enemyName, 1));
+        }
+
+        if (m_room.isBossRoom() || dynamic_cast<Boss*>(enemy) != nullptr) {
+            std::cout << "\n============================================================\n";
+            std::cout << "  *** VICTORY! YOU HAVE SLAIN THE DUNGEON OVERLORD! ***     \n";
+            std::cout << "          YOU HAVE RESTORED LIGHT TO THE REALM!             \n";
+            std::cout << "============================================================\n";
+            if (m_engine) {
+                m_engine->onBossDefeated();
+            }
         }
 
         return true;
@@ -300,3 +324,41 @@ bool RecipesCommand::execute() {
 std::string RecipesCommand::description() const {
     return "Listed crafting recipes";
 }
+
+// ==================== SaveCommand ====================
+SaveCommand::SaveCommand(GameEngine& engine, std::string saveName)
+    : m_engine(engine), m_saveName(std::move(saveName)) {}
+
+bool SaveCommand::execute() {
+    return m_engine.saveGame(m_saveName);
+}
+
+std::string SaveCommand::description() const {
+    return "Saved game session";
+}
+
+// ==================== LoadCommand ====================
+LoadCommand::LoadCommand(GameEngine& engine, std::string playerName)
+    : m_engine(engine), m_playerName(std::move(playerName)) {}
+
+bool LoadCommand::execute() {
+    return m_engine.loadGame(m_playerName);
+}
+
+std::string LoadCommand::description() const {
+    return "Loaded game session for '" + m_playerName + "'";
+}
+
+// ==================== LeaderboardCommand ====================
+LeaderboardCommand::LeaderboardCommand(const SaveManager& saveManager, std::string sortBy, std::string difficultyFilter)
+    : m_saveManager(saveManager), m_sortBy(std::move(sortBy)), m_difficultyFilter(std::move(difficultyFilter)) {}
+
+bool LeaderboardCommand::execute() {
+    m_saveManager.printLeaderboard(m_sortBy, m_difficultyFilter);
+    return true;
+}
+
+std::string LeaderboardCommand::description() const {
+    return "Viewed Hall of Fame Leaderboard";
+}
+

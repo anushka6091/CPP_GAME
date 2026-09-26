@@ -1,6 +1,7 @@
 #include "DungeonGenerator.h"
 #include "Goblin.h"
 #include "Skeleton.h"
+#include "Boss.h"
 #include "Item.h"
 #include "Container.h"
 #include <random>
@@ -112,10 +113,10 @@ std::unique_ptr<Dungeon> StandardDungeonGenerator::generate(int seed, int diffic
     // Designate Boss Room
     dungeon->setBossRoom(deepestRoom);
 
-    // 4. Populate Boss Room
-    int bossHp = 30 + difficultyLevel * 10;
-    int bossAtk = 10 + difficultyLevel * 3;
-    auto bossEnemy = std::make_unique<Skeleton>("Dungeon Dragon Overlord", bossHp, bossAtk, 3);
+    // 4. Populate Boss Room with Multi-Phase Boss
+    int bossHp = 70 + difficultyLevel * 15;
+    int bossAtk = 12 + difficultyLevel * 3;
+    auto bossEnemy = std::make_unique<Boss>("Dungeon Dragon Overlord", bossHp, bossAtk, 4);
     deepestRoom->setEnemy(std::move(bossEnemy));
 
     auto bossChest = std::make_unique<Container>("Royal Treasure Chest", "A massive gold-trimmed chest overflowing with ancient relics.");
