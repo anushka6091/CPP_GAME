@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.14)
-project(DungeonCrawlerRPG CXX C)
+project(MysticalMyth CXX C)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -36,15 +36,15 @@ file(GLOB SOURCES
     "src/*.cpp"
 )
 
-add_executable(dungeon_crawler ${SOURCES})
+add_executable(mystical_myth ${SOURCES})
 
-target_include_directories(dungeon_crawler PUBLIC include)
-target_link_libraries(dungeon_crawler PRIVATE nlohmann_json::nlohmann_json)
+target_include_directories(mystical_myth PUBLIC include)
+target_link_libraries(mystical_myth PRIVATE nlohmann_json::nlohmann_json)
 
 if(TARGET SQLite::SQLite3)
-    target_link_libraries(dungeon_crawler PRIVATE SQLite::SQLite3)
+    target_link_libraries(mystical_myth PRIVATE SQLite::SQLite3)
 elseif(TARGET sqlite3_bundled)
-    target_link_libraries(dungeon_crawler PRIVATE sqlite3_bundled)
+    target_link_libraries(mystical_myth PRIVATE sqlite3_bundled)
 else()
-    target_link_libraries(dungeon_crawler PRIVATE sqlite3)
+    target_link_libraries(mystical_myth PRIVATE sqlite3)
 endif()

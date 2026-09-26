@@ -16,7 +16,7 @@ GameEngine::GameEngine()
 
 void GameEngine::initialize() {
     std::cout << "====================================================\n";
-    std::cout << "   WELCOME TO THE DUNGEON CRAWLER ENGINE (PART 6)  \n";
+    std::cout << "          WELCOME TO MYSTICAL MYTH (PART 6)         \n";
     std::cout << "====================================================\n\n";
 
     std::cout << "Enter your Hero's name: ";
@@ -189,7 +189,7 @@ void GameEngine::runCommandLoop() {
             continue;
         }
         if (line == "quit" || line == "exit") {
-            std::cout << "Exiting Dungeon Crawler Engine. Goodbye!\n";
+            std::cout << "Exiting Mystical Myth Engine. Goodbye!\n";
             break;
         }
 

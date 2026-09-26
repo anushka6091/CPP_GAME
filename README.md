@@ -1,13 +1,13 @@
-# Aethelgard: Pattern-Driven C++17 Roguelike Dungeon Engine
+# Mystical Myth: Pattern-Driven C++17 Roguelike Dungeon Engine
 
 [![C++17](https://img.shields.io/badge/C%2B%2B-17-blue.svg?logo=c%2B%2B)](https://en.cppreference.com/w/cpp/17)
 [![Build](https://img.shields.io/badge/Build-CMake-brightgreen.svg?logo=cmake)](https://cmake.org/)
 [![Database](https://img.shields.io/badge/Database-SQLite3-lightgrey.svg?logo=sqlite)](https://www.sqlite.org/)
 [![Serialization](https://img.shields.io/badge/JSON-nlohmann--json-orange.svg)](https://github.com/nlohmann/json)
-[![Tests](https://img.shields.io/badge/Tests-100%25%20Passing-success.svg)](file:///C:/Users/anush/Downloads/CPP_GAME/src/TestSolvability.cpp)
+[![Tests](https://img.shields.io/badge/Tests-100%25%20Passing-success.svg)](src/TestSolvability.cpp)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-**Aethelgard** is an extensible, pattern-driven roguelike dungeon crawler engine written in modern C++17. Far more than a simple terminal game, this project serves as a showcase of software engineering craft: zero-raw-pointer resource management (RAII), SOLID architectural principles, loose coupling via pub/sub telemetry, relational database persistence, and eight classic Gang of Four (GoF) design patterns working in concert. Every subsystem—from procedural dungeon graphs guaranteed 100% beatable via automated BFS solvers to an autonomous multi-phase boss state machine—is designed for modular expansion, clear testability, and enterprise-grade code maintainability.
+**Mystical Myth** is an extensible, pattern-driven roguelike dungeon crawler engine written in modern C++17. Far more than a simple terminal game, this project serves as a showcase of software engineering craft: zero-raw-pointer resource management (RAII), SOLID architectural principles, loose coupling via pub/sub telemetry, relational database persistence, and eight classic Gang of Four (GoF) design patterns working in concert. Every subsystem—from procedural dungeon graphs guaranteed 100% beatable via automated BFS solvers to an autonomous multi-phase boss state machine—is designed for modular expansion, clear testability, and enterprise-grade code maintainability.
 
 ---
 
@@ -51,14 +51,14 @@ The engine was architected from day one to demonstrate how classic Gang of Four 
 
 | Pattern | Where It's Used (Class / File) | Why It Fits Here |
 | :--- | :--- | :--- |
-| **Inheritance & Polymorphism** | [`Character`](file:///C:/Users/anush/Downloads/CPP_GAME/include/Character.h), [`Player`](file:///C:/Users/anush/Downloads/CPP_GAME/include/Player.h), [`Enemy`](file:///C:/Users/anush/Downloads/CPP_GAME/include/Enemy.h), [`Goblin`](file:///C:/Users/anush/Downloads/CPP_GAME/include/Goblin.h), [`Skeleton`](file:///C:/Users/anush/Downloads/CPP_GAME/include/Skeleton.h), [`Boss`](file:///C:/Users/anush/Downloads/CPP_GAME/include/Boss.h) | Establishes a strict combat and stat lifecycle contract across all living entities, allowing the engine combat loop to operate on abstract references without type branching. |
-| **Composite** | [`GameObject`](file:///C:/Users/anush/Downloads/CPP_GAME/include/GameObject.h), [`Item`](file:///C:/Users/anush/Downloads/CPP_GAME/include/Item.h), [`Container`](file:///C:/Users/anush/Downloads/CPP_GAME/include/Container.h) | Allows leaf items (potions, swords) and composite containers (chests, pouches containing nested items) to share the same interface. Players can pick up, inspect, or search containers recursively without special cases. |
-| **Command** | [`Command`](file:///C:/Users/anush/Downloads/CPP_GAME/include/Command.h), [`MoveCommand`](file:///C:/Users/anush/Downloads/CPP_GAME/include/ConcreteCommands.h), [`AttackCommand`](file:///C:/Users/anush/Downloads/CPP_GAME/include/ConcreteCommands.h), [`CommandHistory`](file:///C:/Users/anush/Downloads/CPP_GAME/include/CommandHistory.h) | Encapsulates player user actions as standalone first-class objects. Decouples CLI input parsing from gameplay execution, enabling instant command validation, action logging, and full session replay. |
-| **State (Character Conditions)** | [`CharacterState`](file:///C:/Users/anush/Downloads/CPP_GAME/include/CharacterState.h), [`AliveState`](file:///C:/Users/anush/Downloads/CPP_GAME/include/CharacterStates.h), [`PoisonedState`](file:///C:/Users/anush/Downloads/CPP_GAME/include/CharacterStates.h), [`StunnedState`](file:///C:/Users/anush/Downloads/CPP_GAME/include/CharacterStates.h), [`DeadState`](file:///C:/Users/anush/Downloads/CPP_GAME/include/CharacterStates.h) | Encapsulates temporary condition mechanics (damage-over-turn ticks, action suppression) cleanly without cluttering the `Character` class with nested `if/switch` flag checks. |
-| **State (Boss Phases)** | [`BossPhaseState`](file:///C:/Users/anush/Downloads/CPP_GAME/include/BossPhaseState.h), [`Phase1State`](file:///C:/Users/anush/Downloads/CPP_GAME/include/BossPhaseStates.h), [`Phase2State`](file:///C:/Users/anush/Downloads/CPP_GAME/include/BossPhaseStates.h), [`AscendedState`](file:///C:/Users/anush/Downloads/CPP_GAME/include/BossPhaseStates.h), [`EnrageState`](file:///C:/Users/anush/Downloads/CPP_GAME/include/BossPhaseStates.h) | Independent second use of the State pattern. Controls multi-tier boss combat behavior (stat modifications, scale hardening, minion ally summoning, meteor attacks) driven by health thresholds. Kept distinct from `CharacterState` because boss phase logic is a behavioral strategy machine rather than a temporary debuff condition. |
-| **Factory / Builder** | [`DungeonGenerator`](file:///C:/Users/anush/Downloads/CPP_GAME/include/DungeonGenerator.h), [`StandardDungeonGenerator`](file:///C:/Users/anush/Downloads/CPP_GAME/include/DungeonGenerator.h) | Encapsulates complex procedural generation algorithms (seed randomization, room graph instantiation, exit cross-linking, item/enemy placement, and BFS path solvability verification) away from the game loop. |
-| **Observer** | [`EventBus`](file:///C:/Users/anush/Downloads/CPP_GAME/include/EventBus.h), [`GameEvent`](file:///C:/Users/anush/Downloads/CPP_GAME/include/GameEvent.h), [`Quest`](file:///C:/Users/anush/Downloads/CPP_GAME/include/Quest.h), [`ConcreteQuests`](file:///C:/Users/anush/Downloads/CPP_GAME/include/ConcreteQuests.h) | Implements an asynchronous event notification pipeline. Combat and movement commands publish events (`ItemCollected`, `EnemyDefeated`) to the bus without coupling gameplay logic directly to quest progress or door locks. |
-| **Memento** | [`GameMemento`](file:///C:/Users/anush/Downloads/CPP_GAME/include/GameMemento.h), [`Player`](file:///C:/Users/anush/Downloads/CPP_GAME/include/Player.h), [`GameEngine`](file:///C:/Users/anush/Downloads/CPP_GAME/include/GameEngine.h), [`SaveManager`](file:///C:/Users/anush/Downloads/CPP_GAME/include/SaveManager.h) | Captures deep snapshots of player stats, equipment, inventory trees, quest states, turn metrics, and dungeon seeds without exposing private fields. `SaveManager` acts as the Caretaker, serializing mementos to JSON blobs in SQLite. |
+| **Inheritance & Polymorphism** | [`Character`](include/Character.h), [`Player`](include/Player.h), [`Enemy`](include/Enemy.h), [`Goblin`](include/Goblin.h), [`Skeleton`](include/Skeleton.h), [`Boss`](include/Boss.h) | Establishes a strict combat and stat lifecycle contract across all living entities, allowing the engine combat loop to operate on abstract references without type branching. |
+| **Composite** | [`GameObject`](include/GameObject.h), [`Item`](include/Item.h), [`Container`](include/Container.h) | Allows leaf items (potions, swords) and composite containers (chests, pouches containing nested items) to share the same interface. Players can pick up, inspect, or search containers recursively without special cases. |
+| **Command** | [`Command`](include/Command.h), [`MoveCommand`](include/ConcreteCommands.h), [`AttackCommand`](include/ConcreteCommands.h), [`CommandHistory`](include/CommandHistory.h) | Encapsulates player user actions as standalone first-class objects. Decouples CLI input parsing from gameplay execution, enabling instant command validation, action logging, and full session replay. |
+| **State (Character Conditions)** | [`CharacterState`](include/CharacterState.h), [`AliveState`](include/CharacterStates.h), [`PoisonedState`](include/CharacterStates.h), [`StunnedState`](include/CharacterStates.h), [`DeadState`](include/CharacterStates.h) | Encapsulates temporary condition mechanics (damage-over-turn ticks, action suppression) cleanly without cluttering the `Character` class with nested `if/switch` flag checks. |
+| **State (Boss Phases)** | [`BossPhaseState`](include/BossPhaseState.h), [`Phase1State`](include/BossPhaseStates.h), [`Phase2State`](include/BossPhaseStates.h), [`AscendedState`](include/BossPhaseStates.h), [`EnrageState`](include/BossPhaseStates.h) | Independent second use of the State pattern. Controls multi-tier boss combat behavior (stat modifications, scale hardening, minion ally summoning, meteor attacks) driven by health thresholds. Kept distinct from `CharacterState` because boss phase logic is a behavioral strategy machine rather than a temporary debuff condition. |
+| **Factory / Builder** | [`DungeonGenerator`](include/DungeonGenerator.h), [`StandardDungeonGenerator`](include/DungeonGenerator.h) | Encapsulates complex procedural generation algorithms (seed randomization, room graph instantiation, exit cross-linking, item/enemy placement, and BFS path solvability verification) away from the game loop. |
+| **Observer** | [`EventBus`](include/EventBus.h), [`GameEvent`](include/GameEvent.h), [`Quest`](include/Quest.h), [`ConcreteQuests`](include/ConcreteQuests.h) | Implements an asynchronous event notification pipeline. Combat and movement commands publish events (`ItemCollected`, `EnemyDefeated`) to the bus without coupling gameplay logic directly to quest progress or door locks. |
+| **Memento** | [`GameMemento`](include/GameMemento.h), [`Player`](include/Player.h), [`GameEngine`](include/GameEngine.h), [`SaveManager`](include/SaveManager.h) | Captures deep snapshots of player stats, equipment, inventory trees, quest states, turn metrics, and dungeon seeds without exposing private fields. `SaveManager` acts as the Caretaker, serializing mementos to JSON blobs in SQLite. |
 
 ---
 
@@ -71,7 +71,7 @@ The engine was architected from day one to demonstrate how classic Gang of Four 
 - **Build System:** CMake (Version 3.14+)
 - **Embedded Database:** SQLite3 (C library / amalgamation linked via CMake)
 - **JSON Serialization:** `nlohmann/json` (header-only modern C++ JSON library)
-- **Testing & Solvability Audit:** Integrated multi-suite test runner with 100-seed BFS graph path verifier (`dungeon_crawler --test`)
+- **Testing & Solvability Audit:** Integrated multi-suite test runner with 100-seed BFS graph path verifier (`mystical_myth --test`)
 
 ---
 
@@ -95,8 +95,8 @@ Ensure you have the following installed on your machine:
 
 ```bash
 # 1. Clone repository
-git clone https://github.com/anushka6091/CPP_GAME.git
-cd CPP_GAME
+git clone https://github.com/anushka6091/mystical-myth.git
+cd mystical-myth
 
 # 2. Configure build with CMake
 mkdir build
@@ -107,10 +107,10 @@ cmake ..
 cmake --build .
 
 # 4. Run the interactive game
-./dungeon_crawler
+./mystical_myth
 
 # 5. Run the automated test suite
-./dungeon_crawler --test
+./mystical_myth --test
 ```
 
 #### Windows MinGW (Direct GCC Compile)
@@ -118,9 +118,9 @@ cmake --build .
 If compiling directly on Windows via MinGW GCC:
 
 ```powershell
-g++ -std=c++14 -Iinclude src/*.cpp third_party/sqlite3.o -o dungeon_crawler.exe
-.\dungeon_crawler.exe --test
-.\dungeon_crawler.exe
+g++ -std=c++14 -Iinclude src/*.cpp third_party/sqlite3.o -o mystical_myth.exe
+.\mystical_myth.exe --test
+.\mystical_myth.exe
 ```
 
 ---
@@ -156,7 +156,7 @@ Upon launch, you will name your hero, configure a dungeon generation seed, and c
 ## Project Structure
 
 ```text
-CPP_GAME/
+mystical-myth/
 ├── CMakeLists.txt                # CMake build configuration (FetchContent / targets)
 ├── README.md                     # Project documentation & design pattern breakdown
 ├── include/                      # Header declarations & contracts
@@ -233,7 +233,7 @@ CPP_GAME/
 The project includes an integrated automated test suite covering all architectural subsystems. Run it via:
 
 ```bash
-./dungeon_crawler --test
+./mystical_myth --test
 ```
 
 ### Verified Test Suites:
